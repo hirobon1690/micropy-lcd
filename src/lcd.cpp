@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <arduino.h>
 
-#define LCD_ADRS 0x7c
+#define LCD_ADRS 0x3E
 #define ONELINE 1
 #define TWOLINES 0
 #define DATA 0x40
