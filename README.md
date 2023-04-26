@@ -1,5 +1,5 @@
 # Overview
-[I2C接続のLCD](https://akizukidenshi.com/catalog/g/gK-08896/)をPlatform IO/Arduino Frameworkで開発しているマイコンで動かすための関数群．(Arduino Uno, ESP32で動作確認済み)
+[I2C接続のLCD](https://akizukidenshi.com/catalog/g/gK-08896/)をMicroPythonで開発しているマイコンで動かすための関数群．(ESP32で動作確認済み)
 
 # とりあえず動かしたい人
 ## ハード
@@ -7,51 +7,46 @@ SCL同士，SDA同士を繋ぐ．このとき10kΩ程度の抵抗でプルアッ
 
 ## ソフト
 ### 準備
-お使いのプロジェクトの`include`フォルダに`lcd.h`を，`src`フォルダに`lcd.cpp`をコピーする．
+`import lcd`
 ### 関数
-```c++
-LCD lcd;
+```python
+lcd=lcd.LCD()
 ```
 インスタンス化
-```c++
-lcd.init(int lines,int cont);
+```python
+lcd.init(lines, cont);
 ```
 初期化関数．最初に実行する．第1引数は行数．デフォルトでは2行．1にするとLCDが2行分の高さを使って1行表示するようになる．第2引数はコントラスト．0~63の64段階で設定できる．デフォルトでは38(3V3駆動では38程度, 5V駆動では12程度がちょうどよい)．
-```c++
-lcd.print(const char* c,int line);
+```python
+lcd.printstr(string, line);
 ```
-表示関数．第1引数は文字列．第2引数は表示する行．デフォルトでは1行目．  
-```c++
-lcd.printf(int line,const char* format, ... );
+表示関数．第1引数は文字列．第2引数は表示する行．デフォルトでは1行目． 使い方はprint関数と同じ．
+
+```python
+lcd.print(str);
 ```
-printf表記もサポート。第1引数は表示する行(必須)，第2引数にフォーマット文字列，第3引数以降は可変長。例えば
-```c++
-int a=1;
-float b=2.3;
-lcd.printf(1,"%d",a);
-lcd.printf(2,"%f",b);
-```
+
 
 ### Tips  
 非ASCII文字を使用する際は[データシート](https://akizukidenshi.com/download/ds/xiamen/AQM1602_rev2.pdf)上の文字コードをエスケープシーケンスを用いて直接指定する．例えば `"ｺﾝﾆﾁﾊ"` を表示したいときは
-```c++
+```python
 lcd.print("\xBA\xDD\xC6\xC1\xCA");
 ```
 のようにする．
 
-```c++
+```python
 lcd.clr();
 ```
 表示内容を消去する．
 
 # その他
-```c++
-lcd.write(int cmd1, int cmd2);
+```python
+lcd.write(cmd1, cmd2);
 ```
 このLCDは2バイトずつ値を送って制御する．1バイト目でコマンドモードかデータモードかを選択し，2バイト目で実際の内容を送信する．この関数では第1引数でモードを選択し，第2引数で内容を送信している．
 
 ## カスタム文字
-このLCDには`CGRAM`と呼ばれるユーザーが定義したキャラクタを保存できるスペースがあり，定義したあとは通常の文字と同じように使用できる．このスペースは`0x00`~`0x07`の8文字分存在する(が，`0x00`はNULL文字の文字コードと被り扱いがやや面倒なので実質7文字分しか使用できないと考えたほうがよい)．定義の処理は初期化関数に含まれる．`lcd.cpp`の配列``Custom_Char5x8``に使用したい字形のビットをセットすると，非ASCII文字と同様の方法で表示できるようになる．  
+このLCDには`CGRAM`と呼ばれるユーザーが定義したキャラクタを保存できるスペースがあり，定義したあとは通常の文字と同じように使用できる．このスペースは`0x00`~`0x07`の8文字分存在する(が，`0x00`はNULL文字の文字コードと被り扱いがやや面倒なので実質7文字分しか使用できないと考えたほうがよい)．定義の処理は初期化関数に含まれる．`lcd.py`のリスト``Custom_Char5x8``に使用したい字形のビットをセットすると，非ASCII文字と同様の方法で表示できるようになる．  
 
 ### Tips
 LCD custom character generator等で検索すると簡単にビットのデータを出力してくれるWebページが見つかる．
